@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aim Trainer</title>
+    <style>
+        html, body {
+            width: 100%; /* Ensure the body takes full width */
+            min-height: 100vh; /* Ensure the body takes at least the full height of the viewport */
+            margin: 0; /* Remove default margin */
+            font-family: 'Arial', sans-serif;
+            background-color: #282c34; /* Dark background for better contrast */
+            padding: 0; /* Remove default padding */
+            overflow: hidden;
+        }
+        h1 {
+            color: #61afef; /* Bright color for the header */
+            text-align: center;
+            margin-bottom: 50px; /* Adds space below the header */
+        }
+        #scoreDisplay {
+            position: fixed; /* Fixed positioning relative to the viewport */
+            top: 20px; /* Distance from the top of the viewport */
+            right: 20px; /* Distance from the right of the viewport */
+            font-size: 20px; /* Larger font size for better visibility */
+            color: #61afef; /* Color for the score text, adjust as needed */
+            background-color: transparent; /* Maintain the background consistency */
+        }
+        .circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            position: absolute;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Aim Trainer</h1>
+    <div id="scoreDisplay">Score: 0</div>
+    <script>
+        let score = 0; // Ensure score is defined
+    
+        function generateCircle() {
+            const circle = document.createElement('div'); // Create a new div element
+            circle.style.width = '50px'; // Set width of the circle
+            circle.style.height = '50px'; // Set height of the circle
+            circle.style.borderRadius = '50%'; // Make the div round
+            circle.style.backgroundColor = 'red'; // Set circle color
+            circle.style.position = 'absolute'; // Use absolute positioning
+            circle.style.left = `${Math.random() * window.innerWidth}px`; // Random horizontal position
+            circle.style.top = `${Math.random() * window.innerHeight}px`; // Random vertical position
+            circle.classList.add('circle'); // Add 'circle' class for styling and identification
+    
+            circle.addEventListener('click', function(event) {
+                event.stopPropagation(); // Prevent click from bubbling to the body
+                score++; // Increment score
+                updateScoreDisplay(); // Update the score display
+                document.body.removeChild(circle); // Remove the current circle
+                generateCircle(); // Generate a new circle
+            });
+    
+            document.body.appendChild(circle); // Append the circle to the body
+        }
+    
+        document.body.addEventListener('click', function(event) {
+            if (!event.target.classList.contains('circle')) {
+                console.log('Missed the circle!');
+                score = 0; // Reset score to 0
+                updateScoreDisplay(); // Update the score display
+            }
+        }, true);
+    
+        function updateScoreDisplay() {
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            scoreDisplay.textContent = `Score: ${score}`;
+        }
+    
+        generateCircle(); // Initial call to generate the first circle
+    </script>
+</body>
+</html>
