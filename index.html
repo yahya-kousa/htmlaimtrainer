@@ -35,50 +35,132 @@
             transition: all 0.2s ease;
             cursor: pointer;
         }
+        #settingsButton {
+            position: fixed; /* Fixed position to keep it in the same place */
+            top: 10px; /* Distance from the top */
+            left: 10px; /* Distance from the left */
+            padding: 10px 20px; /* Padding inside the button */
+            font-size: 16px; /* Text size */
+            color: #FFF; /* Text color */
+            background-color: #333; /* Button background color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Slightly rounded corners for a modern look */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            z-index: 1000; /* Ensure the button is above other elements */
+        }
+        
+        #settingsButton:hover {
+            background-color: #555; /* Slightly change color on hover for feedback */
+        }
+        #difficultyOptions button {
+            display: block; /* Stack the buttons vertically */
+            margin: 5px 0; /* Add some space between the buttons */
+            padding: 5px 10px; /* Padding inside the button */
+            font-size: 14px; /* Text size */
+            color: #FFF; /* Text color */
+            background-color: #333; /* Button background color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Change cursor to pointer on hover */
+        }
+        
+        #difficultyOptions button:hover {
+            background-color: #555; /* Slightly change color on hover for feedback */
+        }
     </style>
 </head>
 <body>
     <h1>Aim Trainer</h1>
+    <button id="settingsButton">Settings</button>
+    <div id="difficultyOptions" style="display: none; position: fixed; top: 40px; left: 10px; background-color: #282c34; padding: 10px; border-radius: 5px;">
+        <button id="easyButton">Easy</button>
+        <button id="hardButton">Hard</button>
+    </div>
     <div id="scoreDisplay">Score: 0</div>
     <script>
-        let score = 0; // Ensure score is defined
+        let score = 0;
+        let difficulty = 'easy'; // Keep track of the current difficulty
     
         function generateCircle() {
-            const circle = document.createElement('div'); // Create a new div element
-            circle.style.width = '50px'; // Set width of the circle
-            circle.style.height = '50px'; // Set height of the circle
-            circle.style.borderRadius = '50%'; // Make the div round
-            circle.style.backgroundColor = 'red'; // Set circle color
-            circle.style.position = 'absolute'; // Use absolute positioning
-            circle.style.left = `${Math.random() * window.innerWidth}px`; // Random horizontal position
-            circle.style.top = `${Math.random() * window.innerHeight}px`; // Random vertical position
-            circle.classList.add('circle'); // Add 'circle' class for styling and identification
+
+            const circle = document.createElement('div');
+            circle.classList.add('game-circle'); // Add this line to ensure the circle has a class
+
+            let circleSize = 50; // Default size for easy difficulty
     
+            if (difficulty === 'hard') {
+                circleSize = Math.random() * (60 - 30) + 30; // Random size between 30px and 60px for hard difficulty
+            }
+    
+            circle.style.width = `${circleSize}px`;
+            circle.style.height = `${circleSize}px`;
+            circle.style.borderRadius = '50%';
+            circle.style.backgroundColor = 'red';
+            circle.style.position = 'absolute';
+            // Adjust position to avoid spawning at the edges, considering dynamic size
+            const maxWidth = window.innerWidth - circleSize;
+            const maxHeight = window.innerHeight - circleSize;
+            circle.style.left = `${Math.random() * maxWidth}px`;
+            circle.style.top = `${Math.random() * maxHeight}px`;
+    
+            // Reintegrate the click functionality for circle respawning
             circle.addEventListener('click', function(event) {
-                event.stopPropagation(); // Prevent click from bubbling to the body
-                score++; // Increment score
-                updateScoreDisplay(); // Update the score display
-                document.body.removeChild(circle); // Remove the current circle
-                generateCircle(); // Generate a new circle
+                event.stopPropagation();
+                score++;
+                updateScoreDisplay();
+                document.body.removeChild(circle);
+                generateCircle(); // Ensure a new circle is generated upon click
             });
     
-            document.body.appendChild(circle); // Append the circle to the body
+            document.body.appendChild(circle);
         }
-    
+
         document.body.addEventListener('click', function(event) {
-            if (!event.target.classList.contains('circle')) {
+            if (!event.target.classList.contains('game-circle')) {
                 console.log('Missed the circle!');
                 score = 0; // Reset score to 0
                 updateScoreDisplay(); // Update the score display
             }
         }, true);
-    
-        function updateScoreDisplay() {
-            const scoreDisplay = document.getElementById('scoreDisplay');
-            scoreDisplay.textContent = `Score: ${score}`;
+        
+        function removeAllCircles() {
+            const existingCircles = document.querySelectorAll('.game-circle'); // Assuming you add this class to your circles
+            existingCircles.forEach(circle => {
+                document.body.removeChild(circle);
+            });
         }
     
-        generateCircle(); // Initial call to generate the first circle
+        // Modify your difficulty button event listeners to include removeAllCircles
+        document.getElementById('easyButton').addEventListener('click', function() {
+            removeAllCircles(); // Remove existing circles before changing difficulty
+            difficulty = 'easy';
+            generateCircle(); // Regenerate the circle with the new difficulty
+        });
+    
+        document.getElementById('hardButton').addEventListener('click', function() {
+            removeAllCircles(); // Remove existing circles before changing difficulty
+            difficulty = 'hard';
+            generateCircle(); // Regenerate the circle with the new difficulty
+        });
+    
+                
+        document.getElementById('settingsButton').addEventListener('click', function() {
+            const difficultyOptions = document.getElementById('difficultyOptions');
+            if (difficultyOptions.style.display === "none") {
+                difficultyOptions.style.display = "block";
+            } else {
+                difficultyOptions.style.display = "none";
+            }
+        });
+    
+        // Ensure this function exists or is correctly implemented to update the score display
+        function updateScoreDisplay() {
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            scoreDisplay.textContent = `Score: ${score}`;        
+        }
+
+        // Initial circle generation
+        generateCircle();
     </script>
 </body>
 </html>
